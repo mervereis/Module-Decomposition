@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Group Chat</title>
+	<link rel="stylesheet" href="style.css" />
+	<script src="script.js" defer></script>
+</head>
+
+<body>
+
+	<div class="chat-container">
+
+		<div class="chat-header">
+			Group Chat
+		</div>
+
+		<div class="chat-messages">
+		</div>
+
+		<form class="chat-input-area">
+			<div class="reply-preview hidden" id="replyPreview">
+				<span class="reply-preview-text" id="replyPreviewText"></span>
+				<button type="button" id="cancelReplyButton">Cancel</button>
+			</div>
+			<input type="text" id="messageText" placeholder="Type a message..." />
+			<button type="submit" id="submitMessage">Send</button>
+		</form>
+
+	</div>
+
+</body>
+
+</html>
