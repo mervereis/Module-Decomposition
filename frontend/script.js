@@ -1,5 +1,5 @@
 const appServerURL =
-  "https://4cej0vpv9kt8dwfgdpr7259h.trainees.hosting.cyf.academy";
+  "https://su8eirz5gisnxsdt3fg4cyvr.trainees.hosting.cyf.academy/";
 
 const currentUser = prompt("Enter your name:") || "Unknown";
 let lastTimestamp = 0;

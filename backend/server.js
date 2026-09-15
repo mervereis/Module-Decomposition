@@ -47,7 +47,7 @@ app.use(
     origin: [
       "http://localhost:5500",
       "http://127.0.0.1:5500",
-      "https://7rsam4mmh651iuqzi0gz1ibv.trainees.hosting.cyf.academy/",
+      "https://qgywlpv4fooqyvnhbqyxs5pw.trainees.hosting.cyf.academy/",
     ],
   }),
 );
