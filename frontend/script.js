@@ -1,4 +1,5 @@
-const appServerURL = "http://127.0.0.1:3000";
+const appServerURL =
+  "https://4cej0vpv9kt8dwfgdpr7259h.trainees.hosting.cyf.academy";
 
 const currentUser = prompt("Enter your name:") || "Unknown";
 let lastTimestamp = 0;
@@ -6,14 +7,10 @@ let displayedMessages = [];
 let replyToMessage = null;
 
 async function setup() {
-  await renderMessages();
-
   const messageText = document.getElementById("messageText");
   const submitMessage = document.getElementById("submitMessage");
   const messagesContainer = document.querySelector(".chat-messages");
   const cancelReplyButton = document.getElementById("cancelReplyButton");
-  const messageRefreshInterval = 500;
-
   submitMessage.addEventListener("click", async (e) => {
     e.preventDefault();
     const message = messageText.value.trim();
@@ -23,7 +20,6 @@ async function setup() {
       if (success) {
         messageText.value = "";
         clearReplyPreview();
-        await renderMessages();
       } else {
         alert("Failed to send message. Please try again.");
       }
@@ -52,28 +48,41 @@ async function setup() {
 
       const success = await reactToMessage(messageId, reaction);
       if (success) {
-        await renderMessages();
       }
     }
   });
 
-  setInterval(renderMessages, messageRefreshInterval);
+  pollForMessages();
 }
 
-async function renderMessages() {
-  const messages = await fetchMessages(lastTimestamp);
-  if (messages.length === 0) {
+async function pollForMessages() {
+  try {
+    const messages = await fetchMessages(lastTimestamp);
+
+    if (messages.length > 0) {
+      messages.sort((a, b) => a.timestamp - b.timestamp);
+      const newMessages = messages.filter(
+        (message) =>
+          !displayedMessages.some(
+            (item) => String(item.id) === String(message.id),
+          ),
+      );
+
+      if (newMessages.length > 0) {
+        displayedMessages.push(...newMessages);
+        lastTimestamp = Math.max(
+          lastTimestamp,
+          ...newMessages.map((message) => message.timestamp),
+        );
+        appendMessages(newMessages);
+      }
+    }
+  } catch (error) {
+    setTimeout(pollForMessages, 1000);
     return;
   }
 
-  if (messages.length > 0) {
-    const lastMessage = messages[messages.length - 1];
-    lastTimestamp = Math.max(lastTimestamp, lastMessage.timestamp);
-  }
-
-  messages.sort((a, b) => a.timestamp - b.timestamp);
-  displayedMessages.push(...messages);
-  appendMessages(messages);
+  setTimeout(pollForMessages, 500);
 }
 
 function appendMessages(messages) {
@@ -135,14 +144,22 @@ function appendMessages(messages) {
 }
 
 async function fetchMessages(lastTimestamp = 0) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30000); // > server's 25s hold
+
   try {
     const response = await fetch(
-      `${appServerURL}/getMessages?since=${lastTimestamp}`,
+      `${appServerURL}/getMessages?since=${lastTimestamp}&longPoll=true`,
+      { cache: "no-store", signal: controller.signal },
     );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return [];
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return response.json();
+  } finally {
+    clearTimeout(timer);
   }
 }
 
