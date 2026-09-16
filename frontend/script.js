@@ -61,19 +61,28 @@ async function pollForMessages() {
 
     if (messages.length > 0) {
       messages.sort((a, b) => a.timestamp - b.timestamp);
-      const newMessages = messages.filter(
-        (message) =>
-          !displayedMessages.some(
-            (item) => String(item.id) === String(message.id),
-          ),
+
+      // since filtresinin ilerlemesi için timestamp'i her zaman güncelle,
+      // mesaj daha önce görülmüş (sadece reaksiyonu değişmiş) olsa bile.
+      lastTimestamp = Math.max(
+        lastTimestamp,
+        ...messages.map((message) => message.timestamp),
       );
 
-      if (newMessages.length > 0) {
-        displayedMessages.push(...newMessages);
-        lastTimestamp = Math.max(
-          lastTimestamp,
-          ...newMessages.map((message) => message.timestamp),
+      const newMessages = [];
+      for (const message of messages) {
+        const isNew = !displayedMessages.some(
+          (item) => String(item.id) === String(message.id),
         );
+        if (isNew) {
+          displayedMessages.push(message);
+          newMessages.push(message);
+        } else {
+          updateMessageReaction(message);
+        }
+      }
+
+      if (newMessages.length > 0) {
         appendMessages(newMessages);
       }
     }
