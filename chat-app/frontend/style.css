@@ -5,25 +5,51 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 .chat-container {
-  width: 400px;
-  height: 600px;
+  width: min(400px, 100%);
+  height: min(600px, 100vh);
+  height: min(600px, 100svh);
   background-color: #1e1e1e;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .chat-header {
   background-color: #155aaa;
-  color: black;
-  padding: 15px;
+  color: #fff;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-header h1 {
+  margin: 0 auto 0 0;
   font-size: 20px;
   font-weight: bold;
+}
+
+.sender-name-label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+#senderName {
+  width: 110px;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #1e1e1e;
+  font: inherit;
 }
 
 .chat-messages {
@@ -33,6 +59,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 0;
+}
+
+.connection-status {
+  margin: auto;
+  color: #e0e0e0;
+  text-align: center;
 }
 
 .message {
@@ -58,7 +91,7 @@ body {
 
 .sender-name {
   font-size: 12px;
-  opacity: 0.75;
+  color: #f2f2f2;
   margin-bottom: 4px;
   font-weight: bold;
 }
@@ -86,6 +119,16 @@ body {
 
 .reaction-button:hover {
   transform: translateY(-1px);
+}
+
+.reaction-button:focus-visible,
+.reply-button:focus-visible,
+#cancelReplyButton:focus-visible,
+.chat-input-area button:focus-visible,
+#senderName:focus-visible,
+.chat-input-area input:focus-visible {
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
 }
 
 .reply-button {
@@ -157,6 +200,7 @@ body {
   flex-direction: column;
   padding: 10px;
   background-color: #2a2a2a;
+  gap: 8px;
 }
 
 .chat-input-area input {
@@ -169,16 +213,45 @@ body {
   color: white;
 }
 
-.chat-input-area input:focus {
-  outline: none;
-}
-
 .chat-input-area button {
-  margin-left: 10px;
+  align-self: flex-end;
   padding: 10px 15px;
   border: none;
   background-color: #155aaa;
-  color: black;
+  color: #fff;
   border-radius: 5px;
   cursor: pointer;
+  font: inherit;
+  font-weight: bold;
+}
+
+.form-status {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 420px) {
+  body {
+    align-items: stretch;
+  }
+
+  .chat-container {
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    border-radius: 0;
+  }
 }

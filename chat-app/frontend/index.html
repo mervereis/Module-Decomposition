@@ -4,33 +4,36 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="A simple live group chat. Read and send messages with your group." />
 	<title>Group Chat</title>
+	<link rel="preconnect" href="https://su8eirz5gisnxsdt3fg4cyvr.trainees.hosting.cyf.academy" crossorigin />
 	<link rel="stylesheet" href="style.css" />
 	<script src="script.js" defer></script>
 </head>
 
 <body>
+	<main class="chat-container" aria-labelledby="chatTitle">
+		<header class="chat-header">
+			<h1 id="chatTitle">Group Chat</h1>
+			<label class="sender-name-label" for="senderName">Your name</label>
+			<input type="text" id="senderName" value="Guest" maxlength="40" autocomplete="nickname" />
+		</header>
 
-	<div class="chat-container">
+		<section class="chat-messages" aria-label="Chat messages" role="log" aria-relevant="additions">
+			<p class="connection-status" id="connectionStatus" role="status">Connecting to chat…</p>
+		</section>
 
-		<div class="chat-header">
-			Group Chat
-		</div>
-
-		<div class="chat-messages">
-		</div>
-
-		<form class="chat-input-area">
-			<div class="reply-preview hidden" id="replyPreview">
+		<form class="chat-input-area" aria-label="Send a message">
+			<div class="reply-preview hidden" id="replyPreview" aria-live="polite">
 				<span class="reply-preview-text" id="replyPreviewText"></span>
-				<button type="button" id="cancelReplyButton">Cancel</button>
+				<button type="button" id="cancelReplyButton">Cancel reply</button>
 			</div>
-			<input type="text" id="messageText" placeholder="Type a message..." />
+			<label class="visually-hidden" for="messageText">Type a message</label>
+			<input type="text" id="messageText" placeholder="Type a message..." autocomplete="off" />
 			<button type="submit" id="submitMessage">Send</button>
+			<p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
 		</form>
-
-	</div>
-
+	</main>
 </body>
 
 </html>

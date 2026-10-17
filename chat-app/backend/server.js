@@ -15,7 +15,6 @@ const messages = [
 const messagesById = new Map(messages.map((msg) => [String(msg.id), msg]));
 const waitingClients = [];
 
-// Date.now() aynı milisaniyede çakışabilir, timestamp'leri tekilleştiriyoruz
 let lastTimestamp = 0;
 function nextTimestamp() {
   const now = Date.now();

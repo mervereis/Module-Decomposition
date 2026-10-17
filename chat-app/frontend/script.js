@@ -1,29 +1,48 @@
 const appServerURL =
-  "https://su8eirz5gisnxsdt3fg4cyvr.trainees.hosting.cyf.academy/";
+  "https://su8eirz5gisnxsdt3fg4cyvr.trainees.hosting.cyf.academy";
 
-const currentUser = prompt("Enter your name:") || "Unknown";
+let currentUser = localStorage.getItem("chatUserName") || "Guest";
 let lastTimestamp = 0;
 let displayedMessages = [];
 let replyToMessage = null;
+let connectionStatus;
 
 async function setup() {
   const messageText = document.getElementById("messageText");
+  const senderName = document.getElementById("senderName");
   const submitMessage = document.getElementById("submitMessage");
   const messagesContainer = document.querySelector(".chat-messages");
   const cancelReplyButton = document.getElementById("cancelReplyButton");
-  submitMessage.addEventListener("click", async (e) => {
+  const form = document.querySelector(".chat-input-area");
+  const formStatus = document.getElementById("formStatus");
+  connectionStatus = document.getElementById("connectionStatus");
+
+  senderName.value = currentUser;
+  senderName.addEventListener("input", () => {
+    currentUser = senderName.value.trim() || "Guest";
+    localStorage.setItem("chatUserName", currentUser);
+  });
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const message = messageText.value.trim();
-    if (message) {
-      const success = await sendMessage(message, replyToMessage?.id);
-      console.log(success);
-      if (success) {
-        messageText.value = "";
-        clearReplyPreview();
-      } else {
-        alert("Failed to send message. Please try again.");
-      }
+    if (!message) return;
+
+    currentUser = senderName.value.trim() || "Guest";
+    localStorage.setItem("chatUserName", currentUser);
+    submitMessage.disabled = true;
+    formStatus.textContent = "Sending message...";
+
+    const success = await sendMessage(message, replyToMessage?.id);
+    if (success) {
+      messageText.value = "";
+      formStatus.textContent = "Message sent.";
+      clearReplyPreview();
+    } else {
+      formStatus.textContent = "Message could not be sent. Please try again.";
     }
+    submitMessage.disabled = false;
+    messageText.focus();
   });
 
   cancelReplyButton.addEventListener("click", () => {
@@ -58,6 +77,10 @@ async function setup() {
 async function pollForMessages() {
   try {
     const messages = await fetchMessages(lastTimestamp);
+    if (connectionStatus) {
+      connectionStatus.remove();
+      connectionStatus = null;
+    }
 
     if (messages.length > 0) {
       messages.sort((a, b) => a.timestamp - b.timestamp);
@@ -87,6 +110,9 @@ async function pollForMessages() {
       }
     }
   } catch (error) {
+    if (connectionStatus) {
+      connectionStatus.textContent = "Connection interrupted. Reconnecting…";
+    }
     setTimeout(pollForMessages, 1000);
     return;
   }
@@ -134,11 +160,15 @@ function appendMessages(messages) {
     likeButton.className = "reaction-button like-button";
     likeButton.dataset.id = message.id;
     likeButton.textContent = `👍 ${message.likes || 0}`;
+    likeButton.setAttribute("aria-label", `Like ${message.sender}'s message. ${message.likes || 0} likes`);
 
     const dislikeButton = document.createElement("button");
     dislikeButton.className = "reaction-button dislike-button";
     dislikeButton.dataset.id = message.id;
     dislikeButton.textContent = `👎 ${message.dislikes || 0}`;
+    dislikeButton.setAttribute("aria-label", `Dislike ${message.sender}'s message. ${message.dislikes || 0} dislikes`);
+
+    replyButton.setAttribute("aria-label", `Reply to ${message.sender}'s message`);
 
     if (role === "received") {
       reactionRow.append(replyButton);
@@ -179,8 +209,6 @@ async function sendMessage(message, replyTo = null) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message, sender: currentUser, replyTo }),
     });
-    console.log(response);
-
     const data = await response.json();
     return data.success;
   } catch (error) {
@@ -253,10 +281,12 @@ function updateMessageReaction(message) {
 
   if (likeButton) {
     likeButton.textContent = `👍 ${message.likes || 0}`;
+    likeButton.setAttribute("aria-label", `Like ${message.sender}'s message. ${message.likes || 0} likes`);
   }
   if (dislikeButton) {
     dislikeButton.textContent = `👎 ${message.dislikes || 0}`;
+    dislikeButton.setAttribute("aria-label", `Dislike ${message.sender}'s message. ${message.dislikes || 0} dislikes`);
   }
 }
 
-window.onload = setup;
+document.addEventListener("DOMContentLoaded", setup, { once: true });
