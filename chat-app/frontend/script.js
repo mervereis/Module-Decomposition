@@ -159,14 +159,12 @@ function appendMessages(messages) {
     const likeButton = document.createElement("button");
     likeButton.className = "reaction-button like-button";
     likeButton.dataset.id = message.id;
-    likeButton.textContent = `👍 ${message.likes || 0}`;
-    likeButton.setAttribute("aria-label", `Like ${message.sender}'s message. ${message.likes || 0} likes`);
+    updateReactionButton(likeButton, message, "like");
 
     const dislikeButton = document.createElement("button");
     dislikeButton.className = "reaction-button dislike-button";
     dislikeButton.dataset.id = message.id;
-    dislikeButton.textContent = `👎 ${message.dislikes || 0}`;
-    dislikeButton.setAttribute("aria-label", `Dislike ${message.sender}'s message. ${message.dislikes || 0} dislikes`);
+    updateReactionButton(dislikeButton, message, "dislike");
 
     replyButton.setAttribute("aria-label", `Reply to ${message.sender}'s message`);
 
@@ -280,13 +278,25 @@ function updateMessageReaction(message) {
   );
 
   if (likeButton) {
-    likeButton.textContent = `👍 ${message.likes || 0}`;
-    likeButton.setAttribute("aria-label", `Like ${message.sender}'s message. ${message.likes || 0} likes`);
+    updateReactionButton(likeButton, message, "like");
   }
   if (dislikeButton) {
-    dislikeButton.textContent = `👎 ${message.dislikes || 0}`;
-    dislikeButton.setAttribute("aria-label", `Dislike ${message.sender}'s message. ${message.dislikes || 0} dislikes`);
+    updateReactionButton(dislikeButton, message, "dislike");
   }
+}
+
+function updateReactionButton(button, message, type) {
+  const isLike = type === "like";
+  const count = message[isLike ? "likes" : "dislikes"] ?? 0;
+  const action = isLike ? "Like" : "Dislike";
+  const emoji = isLike ? "👍" : "👎";
+  const noun = isLike ? "like" : "dislike";
+
+  button.textContent = `${emoji} ${count}`;
+  button.setAttribute(
+    "aria-label",
+    `${action} ${message.sender}'s message. ${count} ${noun}${count === 1 ? "" : "s"}`,
+  );
 }
 
 document.addEventListener("DOMContentLoaded", setup, { once: true });
