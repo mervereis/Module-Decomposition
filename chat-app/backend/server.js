@@ -123,7 +123,6 @@ app.post("/reactMessage", (req, res) => {
     message.dislikes += 1;
   }
 
-  // yeniden damgala ki diğer kullanıcıların since filtresinden geçsin
   message.timestamp = nextTimestamp();
   releaseWaitingClients();
 
