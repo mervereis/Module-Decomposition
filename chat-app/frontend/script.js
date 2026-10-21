@@ -1,15 +1,19 @@
 const appServerURL =
   "https://su8eirz5gisnxsdt3fg4cyvr.trainees.hosting.cyf.academy";
 
-let currentUser = localStorage.getItem("chatUserName") || "Guest";
+let currentUser = "Guest";
 let lastTimestamp = 0;
 let displayedMessages = [];
 let replyToMessage = null;
 let connectionStatus;
 
 async function setup() {
+  const savedUser = localStorage.getItem("chatUserName") || "";
+  const requestedUser = window.prompt("What is your name?", savedUser);
+  currentUser = requestedUser?.trim() || savedUser.trim() || "Guest";
+  localStorage.setItem("chatUserName", currentUser);
+
   const messageText = document.getElementById("messageText");
-  const senderName = document.getElementById("senderName");
   const submitMessage = document.getElementById("submitMessage");
   const messagesContainer = document.querySelector(".chat-messages");
   const cancelReplyButton = document.getElementById("cancelReplyButton");
@@ -17,19 +21,11 @@ async function setup() {
   const formStatus = document.getElementById("formStatus");
   connectionStatus = document.getElementById("connectionStatus");
 
-  senderName.value = currentUser;
-  senderName.addEventListener("input", () => {
-    currentUser = senderName.value.trim() || "Guest";
-    localStorage.setItem("chatUserName", currentUser);
-  });
-
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const message = messageText.value.trim();
     if (!message) return;
 
-    currentUser = senderName.value.trim() || "Guest";
-    localStorage.setItem("chatUserName", currentUser);
     submitMessage.disabled = true;
     formStatus.textContent = "Sending message...";
 
